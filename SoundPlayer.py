@@ -13,7 +13,7 @@ Fs_NOTE = 66    # F Sharp | Fá Sustenido
 G_NOTE = 67     # G       | Sol
 Gs_NOTE = 68    # G Sharp | Sol Sustenido
 A_NOTE = 69     # A       | Lá
-As_NOTE = 70    # A Sharp | Lá Sustenido
+As_NOTE = 70    # A Sharp | Lá Susteniset_instrumentdo
 B_NOTE = 71     # B       | Si
 
 MIDI_VALUE: dict[str:int] = {
@@ -40,12 +40,32 @@ class SoundPlayer:
         self._song:str = ""
         self._action_index = 0
         
-    def _play_note(self, note:int) -> None:
-        pygame.midi.init()
-        self._midi_output = pygame.midi.Output(0)
-        
+    def _play_note(self, note:int) -> None:        
         self._midi_output.note_on(MIDI_VALUE[note] + self._octave_modifier*OCTAVE_SIZE, self._volume)
         pygame.time.wait(self._wait_time)
         self._midi_output.note_off(MIDI_VALUE[note], self._volume)
+            
+    def _init_midi(self) -> None:
+        pygame.midi.init()
+        self._midi_output = pygame.midi.Output(0)
+        self._midi_output.set_instrument(self._instrument)
+            
+    def set_instrument(self, instrument:int) -> None:
+        self._instrument = instrument
+        
+    def set_volume(self, volume:int) -> None:
+        self._volume = volume
     
-        pygame.midi.quit()
+    def set_octave_modifier(self, octave_modifier:int) -> None:
+        self._octave_modifier = octave_modifier
+        
+    def increment_octave(self) -> None:
+        self._octave_modifier += 1
+        
+    def decrement_octave(self) -> None:
+        self._octave_modifier -= 1
+        
+    def set_wait_time(self, wait_time:int) -> None:
+        self._wait_time = wait_time
+        
+    

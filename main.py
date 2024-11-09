@@ -14,6 +14,4 @@ if __name__ == '__main__':
     
     player.process_input(song)
     
-    print(player.actions)
-
     player.play_song()

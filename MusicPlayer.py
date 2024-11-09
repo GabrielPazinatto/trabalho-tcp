@@ -1,4 +1,5 @@
 from enum import Enum
+from collections import defaultdict
 
 from SoundPlayer import SoundPlayer
 
@@ -8,7 +9,8 @@ class Types(Enum):
     LOWERCASE_NOTE = 2,
     ACTION = 3
 
-token_type = {
+
+token_type = defaultdict(lambda: Types.ACTION, {
     'A': Types.NOTE,
     'B': Types.NOTE,
     'C': Types.NOTE,
@@ -23,12 +25,9 @@ token_type = {
     'e': Types.LOWERCASE_NOTE,
     'f': Types.LOWERCASE_NOTE,
     'g': Types.LOWERCASE_NOTE,
-    ' ': Types.ACTION,
-    '!': Types.ACTION
-}
+})
 
-
-class MusicPlayer(SoundPlayer):
+class MusicPlayer(SoundPlayer): 
 
     def __init__(self, octave_modifier: int = 0, wait_time: int = 500, instrument: int = 0, volume: int = 127):
         super().__init__(octave_modifier, wait_time, instrument, volume)
@@ -36,8 +35,26 @@ class MusicPlayer(SoundPlayer):
         self.previous_char: str = ''
 
         self.actions_map = {
-            Types.NOTE: self._play_note
+            Types.NOTE: self._play_note,
+            'O': self._change_instrument,
+            'o': self._change_instrument,
+            'I': self._change_instrument,
+            'i': self._change_instrument,
+            'U': self._change_instrument,
+            'u': self._change_instrument,
+            ' ': self._double_volume,
+            '?': self._increment_octave,
+            '.':self._increment_octave,
         }
+            
+    def play_song(self):
+        self._init_midi()
+        for action in self.actions:
+            try:
+                action[0](action[1])
+            except TypeError:
+                action[0]()
+        self._midi_output.close()
 
     def process_input(self, input: str):
         input = list(input)
@@ -45,6 +62,7 @@ class MusicPlayer(SoundPlayer):
         for i in range(len(input)):
 
             match(token_type[input[i]]):
+                
                 case Types.NOTE:
                     self.actions.append((self.actions_map[Types.NOTE], input[i]))
 
@@ -52,10 +70,20 @@ class MusicPlayer(SoundPlayer):
                     if token_type[self.previous_char] != Types.NOTE:
                         self.actions.append((self.actions_map[Types.NOTE], 0))
                     else:
-                        self.actions.append(self.actions_map[Types.NOTE], input[i])
+                        self.actions.append((self.actions_map[Types.NOTE], input[i].upper()))
 
+                case Types.ACTION:
+                    self.actions.append((self.actions_map[input[i]], input[i]))
+                    
             self.previous_char = input[i]
-
-    def play_song(self):
-        for action in self.actions:
-            action[0](action[1])
+    
+    def _double_volume(self):
+        self._volume = self._volume * 2
+    
+    def _change_instrument(self, instrument:str):
+        pass
+    
+    def _increment_octave(self) -> None:
+        return super().increment_octave()
+    
+    

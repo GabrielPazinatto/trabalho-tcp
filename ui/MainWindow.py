@@ -1,14 +1,28 @@
 from PyQt6.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QLabel, QLineEdit,
+    QMainWindow, QWidget, QLabel, QLineEdit,
     QTextEdit, QPushButton, QComboBox, QHBoxLayout, QVBoxLayout, QSlider, QFormLayout, QSpacerItem, QSizePolicy, QGridLayout
 )
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
-import sys
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        self.play_button = QPushButton()
+        self.import_button = QPushButton()
+        self.prev_button = QPushButton()
+        self.next_button = QPushButton()
+        self.loop_button = QPushButton()
+
+        self.slider = QSlider(Qt.Orientation.Horizontal)
+        
+        self.bpm_input = QLineEdit()
+        
+        self.instrument_combo = QComboBox()
+        
+        self.music_text_box = QTextEdit()
+        
 
         # Window title and increased size
         self.setWindowTitle("Audio Player")
@@ -22,20 +36,20 @@ class MainWindow(QMainWindow):
         texto_label = QLabel("Texto")
         texto_label.setStyleSheet("color: white;")
         
-        texto_textedit = QTextEdit()
-        texto_textedit.setStyleSheet("background-color: #333333; color: white;")
-        texto_textedit.setFixedHeight(450)  # Adjust height for a larger text box
+        self.music_text_box = QTextEdit()
+        self.music_text_box.setStyleSheet("background-color: #333333; color: white;")
+        self.music_text_box.setFixedHeight(450)  # Adjust height for a larger text box
 
         # Grid layout to tightly align label and text box
         texto_layout = QGridLayout()
         texto_layout.setVerticalSpacing(0)  # No vertical spacing between label and text box
         texto_layout.addWidget(texto_label, 0, 0, alignment=Qt.AlignmentFlag.AlignBottom)
-        texto_layout.addWidget(texto_textedit, 1, 0)
+        texto_layout.addWidget(self.music_text_box, 1, 0)
 
         # Submit Button for Texto
-        submit_button = QPushButton("Gerar Música")
-        submit_button.setStyleSheet("background-color: white; color: black;")
-        texto_layout.addWidget(submit_button, 2, 0, alignment=Qt.AlignmentFlag.AlignTop)
+        self.submit_button = QPushButton("Gerar Música")
+        self.submit_button.setStyleSheet("background-color: white; color: black;")
+        texto_layout.addWidget(self.submit_button, 2, 0, alignment=Qt.AlignmentFlag.AlignTop)
 
         # Right panel for Arquivo, BPM, and Instrumento with adjustments
         right_panel = QFormLayout()
@@ -55,10 +69,10 @@ class MainWindow(QMainWindow):
         # Instrumento field
         instrumento_label = QLabel("Instrumento")
         instrumento_label.setStyleSheet("color: white;")
-        instrumento_combo = QComboBox()
-        instrumento_combo.addItems(["Piano", "Guitar", "Drums"])  # Example items
-        instrumento_combo.setStyleSheet("background-color: #333333; color: white;")
-        right_panel.addRow(instrumento_label, instrumento_combo)
+        instrument_combo = QComboBox()
+        instrument_combo.addItems(["Piano", "Guitar", "Drums"])  # Example items
+        instrument_combo.setStyleSheet("background-color: #333333; color: white;")
+        right_panel.addRow(instrumento_label, instrument_combo)
 
         # Layout for Text and Right Panel
         top_layout = QHBoxLayout()
@@ -66,50 +80,53 @@ class MainWindow(QMainWindow):
         top_layout.addLayout(right_panel, 1)
 
         # Import Button (changed from Download)
-        import_button = QPushButton("Importar Arquivo de Texto")
-        import_button.setStyleSheet("background-color: white; color: black;")
-        import_button.setFixedHeight(50)  # Increase button height for better visibility in the larger UI
+        self.import_button = QPushButton("Importar Arquivo de Texto")
+        self.import_button.setStyleSheet("background-color: white; color: black;")
+        self.import_button.setFixedHeight(50)  # Increase button height for better visibility in the larger UI
 
         # Playback Controls
         playback_layout = QHBoxLayout()
         
-        play_button = QPushButton()
-        play_button.setIcon(QIcon.fromTheme("media-playback-start"))
-        play_button.setFixedSize(50, 50)  # Larger buttons for the bigger window
+        self.play_button = QPushButton()
+        self.play_button.setIcon(QIcon.fromTheme("media-playback-start"))
+        self.play_button.setFixedSize(50, 50)  # Larger buttons for the bigger window
         
-        prev_button = QPushButton()
-        prev_button.setIcon(QIcon.fromTheme("media-skip-backward"))
-        prev_button.setFixedSize(50, 50)
+        self.prev_button = QPushButton()
+        self.prev_button.setIcon(QIcon.fromTheme("media-skip-backward"))
+        self.prev_button.setFixedSize(50, 50)
         
-        next_button = QPushButton()
-        next_button.setIcon(QIcon.fromTheme("media-skip-forward"))
-        next_button.setFixedSize(50, 50)
+        self.next_button = QPushButton()
+        self.next_button.setIcon(QIcon.fromTheme("media-skip-forward"))
+        self.next_button.setFixedSize(50, 50)
         
-        loop_button = QPushButton()
-        loop_button.setIcon(QIcon.fromTheme("media-playlist-repeat"))
-        loop_button.setFixedSize(50, 50)
+        self.loop_button = QPushButton()
+        self.loop_button.setIcon(QIcon.fromTheme("media-playlist-repeat"))
+        self.loop_button.setFixedSize(50, 50)
 
         slider = QSlider(Qt.Orientation.Horizontal)
         slider.setFixedHeight(30)  # Increase slider height for better visibility
 
-        playback_layout.addWidget(play_button)
+        playback_layout.addWidget(self.play_button)
         playback_layout.addWidget(slider)
-        playback_layout.addWidget(prev_button)
-        playback_layout.addWidget(loop_button)
-        playback_layout.addWidget(next_button)
+        playback_layout.addWidget(self.prev_button)
+        playback_layout.addWidget(self.loop_button)
+        playback_layout.addWidget(self.next_button)
 
         # Adding widgets to main layout
         main_layout.addLayout(top_layout)
-        main_layout.addWidget(import_button)  # Updated button name and added to layout
+        main_layout.addWidget(self.import_button)  # Updated button name and added to layout
         main_layout.addLayout(playback_layout)
 
         # Set central widget
         container = QWidget()
         container.setLayout(main_layout)
         self.setCentralWidget(container)
+        
+        
 
-# Run the application
-app = QApplication(sys.argv)
-window = MainWindow()
-window.show()
-sys.exit(app.exec())
+#if __name__ == '__main__':
+#    # Run the application
+#    app = QApplication(sys.argv)
+#    window = MainWindow()
+#    window.show()
+#    sys.exit(app.exec())

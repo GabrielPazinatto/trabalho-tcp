@@ -1,17 +1,31 @@
-import pygame.midi
-import pygame.time
-
+from ui.MainWindow import MainWindow
+import sys
+import asyncio
+from qasync import QEventLoop, asyncSlot
+from PyQt6.QtWidgets import QApplication
 from MusicPlayer import MusicPlayer
 
-MUSIC_FILE_PATH = "music.txt"
+app = QApplication(sys.argv)
+loop = QEventLoop()
+window = MainWindow()
+player = MusicPlayer()
+asyncio.set_event_loop(loop)
 
+def play_typed_song():
+    player.play_song()
+
+def submit_song():
+    song = window.music_text_box.toPlainText()
+    print(song)
+    player.process_input(song)
 
 if __name__ == '__main__':
-    song_file = open(MUSIC_FILE_PATH)
-    song = song_file.read()
-    
-    player = MusicPlayer()
-    
-    player.process_input(song)
-    
-    player.play_song()
+
+    player._init_midi()
+
+    window.submit_button.clicked.connect(submit_song)
+    window.play_button.clicked.connect(play_typed_song)
+
+    window.show()
+    with loop:
+        loop.run_forever()

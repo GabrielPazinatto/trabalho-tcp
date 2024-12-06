@@ -1,5 +1,7 @@
 from enum import Enum
 from collections import defaultdict
+import asyncio
+from qasync import asyncSlot, QEventLoop
 
 from SoundPlayer import SoundPlayer
 
@@ -44,18 +46,17 @@ class MusicPlayer(SoundPlayer):
             '.':self._increment_octave,
         }
             
-    def play_song(self):
-        self._init_midi()
+    @asyncSlot()
+    async def play_song(self):
         for action in self.actions:
             try:
-                action[0](action[1])
+                await action[0](action[1])
             except TypeError:
-                action[0]()
-        self._midi_output.close()
+                await action[0]()
 
     def process_input(self, input: str):
         input = list(input)
-
+        self.actions = []
         for i in range(len(input)):
 
             match(token_type[input[i]]):

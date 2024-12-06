@@ -1,5 +1,6 @@
 import pygame
 import pygame.midi
+import asyncio
 
 OCTAVE_SIZE = 12
 
@@ -47,9 +48,9 @@ class SoundPlayer:
         self._song:str = ""
         self._action_index = 0
         
-    def _play_note(self, note:int) -> None:        
+    async def _play_note(self, note:int) -> None:        
         self._midi_output.note_on(MIDI_VALUE[note] + self._octave_modifier*OCTAVE_SIZE, self._volume)
-        pygame.time.wait(self._wait_time)
+        await asyncio.sleep(self._wait_time/1000)
         self._midi_output.note_off(MIDI_VALUE[note], self._volume)
             
     def _init_midi(self) -> None:

@@ -3,12 +3,9 @@ from collections import defaultdict
 
 from SoundPlayer import SoundPlayer
 
-
 class Types(Enum):
     NOTE = 1,
-    LOWERCASE_NOTE = 2,
-    ACTION = 3
-
+    ACTION = 2
 
 token_type = defaultdict(lambda: Types.ACTION, {
     'A': Types.NOTE,
@@ -18,13 +15,13 @@ token_type = defaultdict(lambda: Types.ACTION, {
     'E': Types.NOTE,
     'F': Types.NOTE,
     'G': Types.NOTE,
-    'a': Types.LOWERCASE_NOTE,
-    'b': Types.LOWERCASE_NOTE,
-    'c': Types.LOWERCASE_NOTE,
-    'd': Types.LOWERCASE_NOTE,
-    'e': Types.LOWERCASE_NOTE,
-    'f': Types.LOWERCASE_NOTE,
-    'g': Types.LOWERCASE_NOTE,
+    'a': Types.NOTE,
+    'b': Types.NOTE,
+    'c': Types.NOTE,
+    'd': Types.NOTE,
+    'e': Types.NOTE,
+    'f': Types.NOTE,
+    'g': Types.NOTE,
 })
 
 class MusicPlayer(SoundPlayer): 
@@ -66,12 +63,6 @@ class MusicPlayer(SoundPlayer):
                 case Types.NOTE:
                     self.actions.append((self.actions_map[Types.NOTE], input[i]))
 
-                case Types.LOWERCASE_NOTE:
-                    if token_type[self.previous_char] != Types.NOTE:
-                        self.actions.append((self.actions_map[Types.NOTE], 0))
-                    else:
-                        self.actions.append((self.actions_map[Types.NOTE], input[i].upper()))
-
                 case Types.ACTION:
                     self.actions.append((self.actions_map[input[i]], input[i]))
                     
@@ -81,7 +72,7 @@ class MusicPlayer(SoundPlayer):
         self._volume = self._volume * 2
     
     def _change_instrument(self, instrument:str):
-        pass
+        self._instrument = instrument
     
     def _increment_octave(self) -> None:
         return super().increment_octave()

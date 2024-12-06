@@ -23,7 +23,14 @@ MIDI_VALUE: dict[str:int] = {
     'F': F_NOTE,
     'G': G_NOTE,
     'A': A_NOTE,
-    'B': B_NOTE
+    'B': B_NOTE,
+    'c': C_NOTE,
+    'd': D_NOTE,
+    'e': E_NOTE,
+    'f': F_NOTE,
+    'g': G_NOTE,
+    'a': A_NOTE,
+    'b': B_NOTE,
 }
 
 class SoundPlayer:

@@ -18,6 +18,9 @@ def submit_song():
     song = window.music_text_box.toPlainText()
     print(song)
     player.process_input(song)
+    
+def reset_song():
+    player.reset()
 
 if __name__ == '__main__':
 

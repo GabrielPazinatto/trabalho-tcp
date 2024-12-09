@@ -1,9 +1,11 @@
 import pygame
 import pygame.midi
 import asyncio
+import random
 
 OCTAVE_SIZE = 12
 
+NO_SOUND = -1
 C_NOTE = 60     # C       | Dó
 Cs_NOTE = 61    # C Sharp | Dó Sustenido
 D_NOTE = 62     # D       | Ré
@@ -32,6 +34,7 @@ MIDI_VALUE: dict[str:int] = {
     'g': G_NOTE,
     'a': A_NOTE,
     'b': B_NOTE,
+    ' ': NO_SOUND
 }
 
 class SoundPlayer:
@@ -48,7 +51,11 @@ class SoundPlayer:
         self._song:str = ""
         self._action_index = 0
         
-    async def _play_note(self, note:int) -> None:        
+    async def _play_note(self, note:int) -> None:
+        if note == NO_SOUND:
+            await asyncio.sleep(self._wait_time/1000)
+            return
+                
         self._midi_output.note_on(MIDI_VALUE[note] + self._octave_modifier*OCTAVE_SIZE, self._volume)
         await asyncio.sleep(self._wait_time/1000)
         self._midi_output.note_off(MIDI_VALUE[note], self._volume)
@@ -76,4 +83,11 @@ class SoundPlayer:
     def set_wait_time(self, wait_time:int) -> None:
         self._wait_time = wait_time
         
+    def double_volume(self) -> None:
+        self._volume *=2 
+    
+    def increment_bpm_by_80(self) -> None:
+        self._wait_time -= 80
+        
+
     

@@ -5,6 +5,8 @@ from qasync import QEventLoop, asyncSlot
 from PyQt6.QtWidgets import QApplication
 from MusicPlayer import MusicPlayer
 from Constants import INSTRUMENTS_VALUE_DICT, INSTRUMENTS_VALUE
+from music_saver import save_music
+
 
 app = QApplication(sys.argv)
 loop = QEventLoop()
@@ -41,6 +43,20 @@ def restart_song():
     player.reset()
     player.reset_song()
 
+def save_song():
+    """
+    Obtém o texto da música e salva no arquivo MIDI.
+    """
+    text = window.music_text_box.toPlainText()
+    save_music(
+        text=text,
+        filename="output.mid",
+        instrument=player._instrument,
+        octave_modifier=player._octave_modifier,
+        bpm=120,  # Pode ajustar dinamicamente
+        volume=player._volume
+    )
+
 if __name__ == '__main__':
 
     player._init_midi()
@@ -50,7 +66,7 @@ if __name__ == '__main__':
     window.instrument_combo.currentIndexChanged.connect(change_instrument)
     window.next_button.clicked.connect(stop_playing)
     window.prev_button.clicked.connect(restart_song)
-    window.bpm_input.returnPressed.connect(adjust_bpm)
+    window.save_button.clicked.connect(save_song)
 
     window.show()
     with loop:

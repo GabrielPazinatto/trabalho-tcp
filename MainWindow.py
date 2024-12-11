@@ -118,7 +118,10 @@ class MainWindow(QMainWindow):
         container.setLayout(main_layout)
         self.setCentralWidget(container)
         
-        
+        self.save_button = QPushButton("Salvar Música")
+        self.save_button.setStyleSheet("background-color: white; color: black;")
+        self.save_button.setFixedHeight(50)
+        main_layout.addWidget(self.save_button)
 
 #if __name__ == '__main__':
 #    # Run the application

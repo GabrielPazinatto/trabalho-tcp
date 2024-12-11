@@ -4,11 +4,15 @@ import asyncio
 from qasync import asyncSlot, QEventLoop
 from random import choice
 
+from Constants import MIDI_VALUE_DICT
 from SoundPlayer import SoundPlayer
 
 DEFAULT_VOLUME = 50
 DEFAULT_BPM = 500
 DEFAULT_OCTAVE_MOD = 0
+MAX_OCTAVE_MOD = 5
+MIN_OCTAVE_MOD = -5
+MAX_VOLUME = 255
 
 class Types(Enum):
     NOTE = 1,
@@ -56,8 +60,9 @@ class MusicPlayer(SoundPlayer):
         self.paused = False
         self._is_playing = False
         self._stop_playing = False
+        self._reset_song = False
 
-        self.actions_map = {
+        self.actions_map = defaultdict(lambda: None, {
             Types.NOTE: self._play_note,
             'BPM+': self._increment_bpm_by_80,
             'O': self._change_instrument,
@@ -67,26 +72,47 @@ class MusicPlayer(SoundPlayer):
             'U': self._change_instrument,
             'u': self._change_instrument,
             '?': self._play_random_note,
-            'R+':self._increment_octave,
-            'R-':self._decrement_octave,
+            'R+': self._increment_octave,
+            'R-': self._decrement_octave,
             '+': self._double_volume,
             '-': self._reset_volume,
-        }
+            '\n': self._change_instrument,
+        })
             
     @asyncSlot()
     async def play_song(self):
         self.reset()
         self._is_playing = True
-        for action in self.actions:
+        
+        i = 0
+        while i < len(self.actions):
+            action = self.actions[i]        
+            self._midi_output.set_instrument(self._instrument)
+            
+            if self._reset_song:
+                i = 0
+                action = self.actions[i]        
+                self._reset_song = False
+            
             if self._stop_playing:
                 self._stop_playing = False
-                return
+                break
+            
             while self.paused:
                 await asyncio.sleep(1)
-            try:
-                await action[0](action[1])
-            except:
-                action()
+                
+            if not self._reset_song:
+                try:
+                    await action[0](action[1])
+                except TypeError:
+                    print('\n')
+                    print(action)
+                    action()
+                except:
+                    break
+                
+            i += 1
+                    
         self._is_playing = False
 
     def process_input(self, input: str):
@@ -128,13 +154,18 @@ class MusicPlayer(SoundPlayer):
         self._instrument = instrument
     
     def _increment_octave(self) -> None:
-        return super().increment_octave()
+        if self._octave_modifier < MAX_OCTAVE_MOD:
+            return super().increment_octave()        
     
     def _decrement_octave(self) -> None:
-        return super().decrement_octave()
+        if self._octave_modifier > MIN_OCTAVE_MOD:
+            return super().decrement_octave()
     
     def _double_volume(self) -> None:
-        return super().double_volume()
+        if self._volume*2 < MAX_VOLUME:
+            return super().double_volume()
+        else:
+            self._volume = MAX_VOLUME
     
     def _reset_volume(self):
         self._volume = DEFAULT_VOLUME
@@ -142,17 +173,22 @@ class MusicPlayer(SoundPlayer):
     def _reset_octave(self):
         self._octave_modifier = DEFAULT_OCTAVE_MOD
 
+    def reset_song(self):
+        self._reset_song = True
+
     def _reset_BPM(self):
         self._wait_time = DEFAULT_BPM
     
+    def wipe_song(self):
+        self.actions = []
+    
     def reset(self):
-        self._is_playing = False
         self._reset_volume()
         self._reset_octave()
         self._reset_BPM()
-     
+         
     async def _play_random_note(self) -> None:
-        await self._play_note(choice())
+        await self._play_note(choice(list(MIDI_VALUE_DICT.keys())))
     
     def _increment_bpm_by_80(self) -> None:
         period = self._wait_time/60000

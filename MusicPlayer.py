@@ -2,8 +2,13 @@ from enum import Enum
 from collections import defaultdict
 import asyncio
 from qasync import asyncSlot, QEventLoop
+from random import choice
 
 from SoundPlayer import SoundPlayer
+
+DEFAULT_VOLUME = 50
+DEFAULT_BPM = 500
+DEFAULT_OCTAVE_MOD = 0
 
 class Types(Enum):
     NOTE = 1,
@@ -44,11 +49,13 @@ token_type = defaultdict(lambda: Types.INVALID, {
 
 class MusicPlayer(SoundPlayer): 
 
-    def __init__(self, octave_modifier: int = 0, wait_time: int = 500, instrument: int = 0, volume: int = 127):
+    def __init__(self, octave_modifier: int = 0, wait_time: int = 500, instrument: int = 0, volume: int = DEFAULT_VOLUME):
         super().__init__(octave_modifier, wait_time, instrument, volume)
         self.actions: list[function] = []
         self.previous_char: str = ''
         self.paused = False
+        self._is_playing = False
+        self._stop_playing = False
 
         self.actions_map = {
             Types.NOTE: self._play_note,
@@ -61,19 +68,26 @@ class MusicPlayer(SoundPlayer):
             'u': self._change_instrument,
             '?': self._play_random_note,
             'R+':self._increment_octave,
+            'R-':self._decrement_octave,
             '+': self._double_volume,
+            '-': self._reset_volume,
         }
             
     @asyncSlot()
     async def play_song(self):
-        print(self.actions)
+        self.reset()
+        self._is_playing = True
         for action in self.actions:
-            while(self.paused):
-                await asyncio.sleep(0.1)
+            if self._stop_playing:
+                self._stop_playing = False
+                return
+            while self.paused:
+                await asyncio.sleep(1)
             try:
                 await action[0](action[1])
             except:
                 action()
+        self._is_playing = False
 
     def process_input(self, input: str):
         input = list(input)
@@ -110,14 +124,35 @@ class MusicPlayer(SoundPlayer):
     def _double_volume(self):
         self._volume = self._volume * 2
     
-    def _change_instrument(self, instrument:str):
+    def _change_instrument(self, instrument:int):
         self._instrument = instrument
     
     def _increment_octave(self) -> None:
         return super().increment_octave()
     
+    def _decrement_octave(self) -> None:
+        return super().decrement_octave()
+    
     def _double_volume(self) -> None:
         return super().double_volume()
+    
+    def _reset_volume(self):
+        self._volume = DEFAULT_VOLUME
+
+    def _reset_octave(self):
+        self._octave_modifier = DEFAULT_OCTAVE_MOD
+
+    def _reset_BPM(self):
+        self._wait_time = DEFAULT_BPM
+    
+    def reset(self):
+        self._is_playing = False
+        self._reset_volume()
+        self._reset_octave()
+        self._reset_BPM()
+     
+    async def _play_random_note(self) -> None:
+        await self._play_note(choice())
     
     def _increment_bpm_by_80(self) -> None:
         period = self._wait_time/60000
@@ -125,6 +160,9 @@ class MusicPlayer(SoundPlayer):
         new_freq = current_freq + 80
         new_period = 1/new_freq
         self._wait_time = new_period * 60000
+
+    def switch_paused(self) -> None:
+        self.paused = not self.paused
         
         
         

@@ -1,13 +1,17 @@
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QLabel, QLineEdit,
-    QTextEdit, QPushButton, QComboBox, QHBoxLayout, QVBoxLayout, QSlider, QFormLayout, QSpacerItem, QSizePolicy, QGridLayout
+    QTextEdit, QPushButton, QComboBox, QHBoxLayout, QVBoxLayout, QFormLayout, QSpacerItem, QSizePolicy, QGridLayout
 )
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
 
+from Constants import INSTRUMENTS_VALUE_DICT, INSTRUMENTS_VALUE
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
+
+        instruments = list(INSTRUMENTS_VALUE_DICT.keys())
 
         self.play_button = QPushButton()
         self.import_button = QPushButton()
@@ -15,14 +19,11 @@ class MainWindow(QMainWindow):
         self.next_button = QPushButton()
         self.loop_button = QPushButton()
 
-        self.slider = QSlider(Qt.Orientation.Horizontal)
-        
         self.bpm_input = QLineEdit()
         
         self.instrument_combo = QComboBox()
         
         self.music_text_box = QTextEdit()
-        
 
         # Window title and increased size
         self.setWindowTitle("Audio Player")
@@ -69,10 +70,10 @@ class MainWindow(QMainWindow):
         # Instrumento field
         instrumento_label = QLabel("Instrumento")
         instrumento_label.setStyleSheet("color: white;")
-        instrument_combo = QComboBox()
-        instrument_combo.addItems(["Piano", "Guitar", "Drums"])  # Example items
-        instrument_combo.setStyleSheet("background-color: #333333; color: white;")
-        right_panel.addRow(instrumento_label, instrument_combo)
+        self.instrument_combo = QComboBox()
+        self.instrument_combo.addItems(instruments)  # Example items
+        self.instrument_combo.setStyleSheet("background-color: #333333; color: white;")
+        right_panel.addRow(instrumento_label, self.instrument_combo)
 
         # Layout for Text and Right Panel
         top_layout = QHBoxLayout()
@@ -103,11 +104,7 @@ class MainWindow(QMainWindow):
         self.loop_button.setIcon(QIcon.fromTheme("media-playlist-repeat"))
         self.loop_button.setFixedSize(50, 50)
 
-        slider = QSlider(Qt.Orientation.Horizontal)
-        slider.setFixedHeight(30)  # Increase slider height for better visibility
-
         playback_layout.addWidget(self.play_button)
-        playback_layout.addWidget(slider)
         playback_layout.addWidget(self.prev_button)
         playback_layout.addWidget(self.loop_button)
         playback_layout.addWidget(self.next_button)

@@ -1,41 +1,10 @@
 import pygame
 import pygame.midi
 import asyncio
+from Constants import MIDI_VALUE_DICT, MIDI_VALUE
 import random
 
 OCTAVE_SIZE = 12
-
-NO_SOUND = -1
-C_NOTE = 60     # C       | Dó
-Cs_NOTE = 61    # C Sharp | Dó Sustenido
-D_NOTE = 62     # D       | Ré
-Ds_NOTE = 63    # D Sharp | Ré Sustenido
-E_NOTE = 64     # E       | Mi
-F_NOTE = 65     # F       | Fá
-Fs_NOTE = 66    # F Sharp | Fá Sustenido
-G_NOTE = 67     # G       | Sol
-Gs_NOTE = 68    # G Sharp | Sol Sustenido
-A_NOTE = 69     # A       | Lá
-As_NOTE = 70    # A Sharp | Lá Susteniset_instrumentdo
-B_NOTE = 71     # B       | Si
-
-MIDI_VALUE: dict[str:int] = {
-    'C': C_NOTE,
-    'D': D_NOTE,
-    'E': E_NOTE,
-    'F': F_NOTE,
-    'G': G_NOTE,
-    'A': A_NOTE,
-    'B': B_NOTE,
-    'c': C_NOTE,
-    'd': D_NOTE,
-    'e': E_NOTE,
-    'f': F_NOTE,
-    'g': G_NOTE,
-    'a': A_NOTE,
-    'b': B_NOTE,
-    ' ': NO_SOUND
-}
 
 class SoundPlayer:
     
@@ -52,18 +21,18 @@ class SoundPlayer:
         self._action_index = 0
         
     async def _play_note(self, note:int) -> None:
-        if note == NO_SOUND:
+        if note == MIDI_VALUE.NO_SOUND:
             await asyncio.sleep(self._wait_time/1000)
             return
                 
-        self._midi_output.note_on(MIDI_VALUE[note] + self._octave_modifier*OCTAVE_SIZE, self._volume)
+        self._midi_output.set_instrument(self._instrument)
+        self._midi_output.note_on(int(MIDI_VALUE_DICT[note]) + self._octave_modifier*OCTAVE_SIZE, self._volume)
         await asyncio.sleep(self._wait_time/1000)
-        self._midi_output.note_off(MIDI_VALUE[note], self._volume)
+        self._midi_output.note_off(int(MIDI_VALUE_DICT[note]), self._volume)
             
     def _init_midi(self) -> None:
         pygame.midi.init()
         self._midi_output = pygame.midi.Output(0)
-        self._midi_output.set_instrument(self._instrument)
             
     def set_instrument(self, instrument:int) -> None:
         self._instrument = instrument

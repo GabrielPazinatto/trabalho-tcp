@@ -26,6 +26,13 @@ def submit_song():
 def change_instrument():
     instrument = window.instrument_combo.currentText()
     player.set_instrument(INSTRUMENTS_VALUE_DICT[instrument])
+
+def adjust_bpm():
+    try:
+        bpm = 60000/(int(window.bpm_input.text()))
+    except:
+        bpm = 500
+    player.set_wait_time(bpm)
     
 def stop_playing():
     player._stop_playing = True
@@ -43,6 +50,7 @@ if __name__ == '__main__':
     window.instrument_combo.currentIndexChanged.connect(change_instrument)
     window.next_button.clicked.connect(stop_playing)
     window.prev_button.clicked.connect(restart_song)
+    window.bpm_input.returnPressed.connect(adjust_bpm)
 
     window.show()
     with loop:

@@ -60,9 +60,8 @@ class MainWindow(QMainWindow):
         # BPM field
         bpm_label = QLabel("Bpm")
         bpm_label.setStyleSheet("color: white;")
-        bpm_input = QLineEdit()
-        bpm_input.setStyleSheet("background-color: #333333; color: white;")
-        right_panel.addRow(bpm_label, bpm_input)
+        self.bpm_input.setStyleSheet("background-color: #333333; color: white;")
+        right_panel.addRow(bpm_label, self.bpm_input)
 
         # Spacer between BPM and Instrumento fields
         right_panel.addItem(QSpacerItem(0, 30, QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Fixed))

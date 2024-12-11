@@ -24,15 +24,14 @@ class SoundPlayer:
         if note == MIDI_VALUE.NO_SOUND:
             await asyncio.sleep(self._wait_time/1000)
             return
-                
-        self._midi_output.set_instrument(self._instrument)
+        
         self._midi_output.note_on(int(MIDI_VALUE_DICT[note]) + self._octave_modifier*OCTAVE_SIZE, self._volume)
         await asyncio.sleep(self._wait_time/1000)
-        self._midi_output.note_off(int(MIDI_VALUE_DICT[note]), self._volume)
+        self._midi_output.note_off(int(MIDI_VALUE_DICT[note]) + self._octave_modifier*OCTAVE_SIZE, self._volume)
             
     def _init_midi(self) -> None:
         pygame.midi.init()
-        self._midi_output = pygame.midi.Output(0)
+        self._midi_output = pygame.midi.Output(0)        
             
     def set_instrument(self, instrument:int) -> None:
         self._instrument = instrument

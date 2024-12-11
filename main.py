@@ -1,6 +1,5 @@
 from MainWindow import MainWindow
 import sys
-import time
 import asyncio
 from qasync import QEventLoop, asyncSlot
 from PyQt6.QtWidgets import QApplication
@@ -24,19 +23,16 @@ def submit_song():
     print(song)
     player.process_input(song)
     
-def reset_song():
-    player.reset()
-
 def change_instrument():
     instrument = window.instrument_combo.currentText()
     player.set_instrument(INSTRUMENTS_VALUE_DICT[instrument])
-
-def restart():
-    player._stop_playing = True
-    play_typed_song()
-
+    
 def stop_playing():
-    player._is_playing = False
+    player._stop_playing = True
+    
+def restart_song():
+    player.reset()
+    player.reset_song()
 
 if __name__ == '__main__':
 
@@ -45,8 +41,8 @@ if __name__ == '__main__':
     window.submit_button.clicked.connect(submit_song)
     window.play_button.clicked.connect(play_typed_song)
     window.instrument_combo.currentIndexChanged.connect(change_instrument)
-    window.prev_button.clicked.connect(restart)
     window.next_button.clicked.connect(stop_playing)
+    window.prev_button.clicked.connect(restart_song)
 
     window.show()
     with loop:

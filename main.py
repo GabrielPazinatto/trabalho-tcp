@@ -15,6 +15,7 @@ player = MusicPlayer()
 asyncio.set_event_loop(loop)
 
 def play_typed_song():
+    print(player._is_playing)
     if not player._is_playing:
         player.play_song()
     else:
@@ -22,7 +23,6 @@ def play_typed_song():
 
 def submit_song():
     song = window.music_text_box.toPlainText()
-    print(song)
     player.process_input(song)
     
 def change_instrument():
@@ -42,6 +42,9 @@ def stop_playing():
 def restart_song():
     player.reset()
     player.reset_song()
+    
+def set_repeat_song():
+    player._repeat_song = not player._repeat_song
 
 def save_song():
     """
@@ -67,6 +70,7 @@ if __name__ == '__main__':
     window.next_button.clicked.connect(stop_playing)
     window.prev_button.clicked.connect(restart_song)
     window.save_button.clicked.connect(save_song)
+    window.loop_button.clicked.connect(set_repeat_song)
 
     window.show()
     with loop:

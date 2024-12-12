@@ -102,6 +102,10 @@ class MainWindow(QMainWindow):
         self.loop_button = QPushButton()
         self.loop_button.setIcon(QIcon.fromTheme("media-playlist-repeat"))
         self.loop_button.setFixedSize(50, 50)
+        
+        self.save_button = QPushButton("Salvar Música")
+        self.save_button.setStyleSheet("background-color: white; color: black;")
+        self.save_button.setFixedHeight(50)
 
         playback_layout.addWidget(self.play_button)
         playback_layout.addWidget(self.prev_button)
@@ -110,17 +114,12 @@ class MainWindow(QMainWindow):
 
         # Adding widgets to main layout
         main_layout.addLayout(top_layout)
-        main_layout.addWidget(self.import_button)  # Updated button name and added to layout
         main_layout.addLayout(playback_layout)
 
         # Set central widget
         container = QWidget()
         container.setLayout(main_layout)
         self.setCentralWidget(container)
-        
-        self.save_button = QPushButton("Salvar Música")
-        self.save_button.setStyleSheet("background-color: white; color: black;")
-        self.save_button.setFixedHeight(50)
         main_layout.addWidget(self.save_button)
 
 #if __name__ == '__main__':

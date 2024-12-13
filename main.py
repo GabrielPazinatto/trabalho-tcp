@@ -45,7 +45,17 @@ def restart_song():
     
 def set_repeat_song():
     player._repeat_song = not player._repeat_song
+    if player._repeat_song == True:
+        window.loop_button.set_background_color("Lime")
+    else:
+        window.loop_button.set_background_color("#1A1A1A")
 
+def change_button_icon():
+    if player.paused == True:
+        window.play_button.set_icon_pause()
+    else:
+        window.play_button.set_icon_play()
+    
 def save_song():
     """
     Obtém o texto da música e salva no arquivo MIDI.
@@ -66,6 +76,7 @@ if __name__ == '__main__':
 
     window.submit_button.clicked.connect(submit_song)
     window.play_button.clicked.connect(play_typed_song)
+    window.play_button.clicked.connect(change_button_icon)
     window.instrument_combo.currentIndexChanged.connect(change_instrument)
     window.next_button.clicked.connect(stop_playing)
     window.prev_button.clicked.connect(restart_song)

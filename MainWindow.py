@@ -4,6 +4,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtGui import QIcon
 from PyQt6.QtCore import Qt
+import re
 
 from Constants import INSTRUMENTS_VALUE_DICT, INSTRUMENTS_VALUE
 
@@ -13,11 +14,11 @@ class MainWindow(QMainWindow):
 
         instruments = list(INSTRUMENTS_VALUE_DICT.keys())
 
-        self.play_button = QPushButton()
+        self.play_button = PlayBitches("media-playback-start")
         self.import_button = QPushButton()
-        self.prev_button = QPushButton()
-        self.next_button = QPushButton()
-        self.loop_button = QPushButton()
+        self.prev_button = PlayBitches("media-skip-backward")
+        self.next_button = PlayBitches("media-skip-forward")
+        self.loop_button = PlayBitches("media-playlist-repeat")
 
         self.bpm_input = QLineEdit()
         
@@ -87,22 +88,6 @@ class MainWindow(QMainWindow):
         # Playback Controls
         playback_layout = QHBoxLayout()
         
-        self.play_button = QPushButton()
-        self.play_button.setIcon(QIcon.fromTheme("media-playback-start"))
-        self.play_button.setFixedSize(50, 50)  # Larger buttons for the bigger window
-        
-        self.prev_button = QPushButton()
-        self.prev_button.setIcon(QIcon.fromTheme("media-skip-backward"))
-        self.prev_button.setFixedSize(50, 50)
-        
-        self.next_button = QPushButton()
-        self.next_button.setIcon(QIcon.fromTheme("media-skip-forward"))
-        self.next_button.setFixedSize(50, 50)
-        
-        self.loop_button = QPushButton()
-        self.loop_button.setIcon(QIcon.fromTheme("media-playlist-repeat"))
-        self.loop_button.setFixedSize(50, 50)
-        
         self.save_button = QPushButton("Salvar Música")
         self.save_button.setStyleSheet("background-color: white; color: black;")
         self.save_button.setFixedHeight(50)
@@ -122,9 +107,29 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(container)
         main_layout.addWidget(self.save_button)
 
-#if __name__ == '__main__':
-#    # Run the application
-#    app = QApplication(sys.argv)
-#    window = MainWindow()
-#    window.show()
-#    sys.exit(app.exec())
+
+class PlayBitches(QPushButton):
+    def __init__(self, fut_icon:str):
+        super().__init__()
+        self.setIcon(QIcon.fromTheme(fut_icon))
+        self.setFixedSize(50, 50)
+
+    def get_icon(self):
+        return self.icon()
+    
+    def get_background_color(self):
+        color = re.search(r"background-color:\s*(.*);", self.styleSheet())
+        return color.group(1)
+    
+    def set_background_color(self, color) -> None:
+        self.setStyleSheet(f"background-color: {color};")
+        
+    def set_icon_play(self) -> None:
+        self.setIcon(QIcon.fromTheme("media-playback-start"))
+
+    def set_icon_pause(self) -> None:
+        self.setIcon(QIcon.fromTheme("media-playback-pause"))
+
+    
+
+    

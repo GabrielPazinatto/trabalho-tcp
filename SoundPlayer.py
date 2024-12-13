@@ -68,10 +68,7 @@ class SoundPlayer:
         self._wait_time = wait_time
         
     def double_volume(self) -> None:
-        if self._volume*2 >= MAX_VOLUME:
-            return
-        else:
-            self._volume *=2 
+        self._volume *=2 
     
     def increment_bpm_by_80(self) -> None:
         self._wait_time -= 80

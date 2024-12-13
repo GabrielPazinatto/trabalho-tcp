@@ -1,10 +1,11 @@
 import pygame
 import pygame.midi
 import asyncio
-from Constants import MIDI_VALUE_DICT, MIDI_VALUE, INSTRUMENTS_DICT_FROM_CHAR
+from Constants import MIDI_VALUE_DICT, MIDI_VALUE
 import random
 
 OCTAVE_SIZE = 12
+MAX_VOLUME = 200
 
 class SoundPlayer:
     
@@ -20,36 +21,20 @@ class SoundPlayer:
         self._song:str = ""
         self._action_index = 0
         
-    async def _play_note(self, note:int, instrument:int|str = None) -> None:
+    async def _play_note(self, note:int) -> None:
         if note == MIDI_VALUE.NO_SOUND:
             await asyncio.sleep(self._wait_time/1000)
             return
-        
-        if instrument != None:
-            original_instrument = self._instrument
-            self._midi_output.set_instrument(instrument)
-        else:
-            try:
-                self._midi_output.set_instrument(self._instrument)
-            except TypeError:
-                self._midi_output.set_instrument(INSTRUMENTS_DICT_FROM_CHAR[self._instrument])
         
         self._midi_output.note_on(int(MIDI_VALUE_DICT[note]) + self._octave_modifier*OCTAVE_SIZE, self._volume)
         await asyncio.sleep(self._wait_time/1000)
         self._midi_output.note_off(int(MIDI_VALUE_DICT[note]) + self._octave_modifier*OCTAVE_SIZE, self._volume)
             
-        if instrument != None:
-            self._midi_output.set_instrument(instrument)
-            
-            
     def _init_midi(self) -> None:
         pygame.midi.init()
         self._midi_output = pygame.midi.Output(0)        
             
-    def set_instrument(self, instrument:int|str) -> None:
-        if type(instrument) == str:
-            self._instrument = INSTRUMENTS_DICT_FROM_CHAR[instrument]
-            
+    def set_instrument(self, instrument:int) -> None:
         self._instrument = instrument
         
     def set_volume(self, volume:int) -> None:
@@ -68,7 +53,10 @@ class SoundPlayer:
         self._wait_time = wait_time
         
     def double_volume(self) -> None:
-        self._volume *=2 
+        if self._volume*2 >= MAX_VOLUME:
+            return
+        else:
+            self._volume *=2 
     
     def increment_bpm_by_80(self) -> None:
         self._wait_time -= 80

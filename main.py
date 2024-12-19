@@ -15,8 +15,7 @@ player = MusicPlayer()
 asyncio.set_event_loop(loop)
 
 def play_typed_song():
-    print(player._is_playing)
-    if not player._is_playing:
+    if not player.get_is_playing():
         player.play_song()
     else:
         player.switch_paused()
@@ -37,21 +36,21 @@ def adjust_bpm():
     player.set_wait_time(bpm)
     
 def stop_playing():
-    player._stop_playing = True
+    player.set_stop_playing(True)
     
 def restart_song():
     player.reset()
     player.reset_song()
     
 def set_repeat_song():
-    player._repeat_song = not player._repeat_song
-    if player._repeat_song == True:
+    player.switch_repeat_song()
+    if player.get_repeat_song() == True:
         window.loop_button.set_background_color("Lime")
     else:
         window.loop_button.set_background_color("#1A1A1A")
 
 def change_button_icon():
-    if player.paused == True:
+    if player.get_paused() == True:
         window.play_button.set_icon_pause()
     else:
         window.play_button.set_icon_play()
@@ -66,7 +65,7 @@ def save_song():
         filename="output.mid",
         instrument=player._instrument,
         octave_modifier=player._octave_modifier,
-        bpm=120,  # Pode ajustar dinamicamente
+        bpm=(60000/player.get_wait_time()),  # Pode ajustar dinamicamente
         volume=player._volume
     )
 
@@ -82,6 +81,7 @@ if __name__ == '__main__':
     window.prev_button.clicked.connect(restart_song)
     window.save_button.clicked.connect(save_song)
     window.loop_button.clicked.connect(set_repeat_song)
+    window.bpm_input.returnPressed.connect(adjust_bpm)
 
     window.show()
     with loop:

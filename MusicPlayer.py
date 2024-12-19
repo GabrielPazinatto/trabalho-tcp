@@ -234,4 +234,22 @@ class MusicPlayer(SoundPlayer):
 
     def switch_paused(self) -> None:
         self.paused = not self.paused
+
+    def set_stop_playing(self,playing):
+        self._stop_playing = playing
+    
+    def get_repeat_song(self):
+        return self._repeat_song
+    
+    def switch_repeat_song(self):
+        self._repeat_song = not self._repeat_song
+
+    def get_paused(self):
+        return self.paused
+    
+    def get_is_playing(self):
+        return self._is_playing
+    
+    def get_wait_time(self):
+        return self._wait_time
         
